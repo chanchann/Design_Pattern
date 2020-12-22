@@ -3,7 +3,9 @@
 #include <thread>
 #include <vector>
 #include <algorithm>
-
+/*
+区分局部静态和静态成员
+*/
 class Singleton {
 protected:
     Singleton(const std::string value): value_(value) {}
@@ -14,36 +16,28 @@ public:
     Singleton(Singleton &other) = delete;
     void operator=(const Singleton &) = delete;
 
-    static Singleton *GetInstance(const std::string& value);
-    // void SomeBusinessLogic()
-    // {
-    //     // ...
-    // }
+    static Singleton& GetInstance(const std::string& value);
 
     std::string value() const{
         return value_;
     } 
 };
 
-Singleton* Singleton::singleton_= nullptr;;
-
-Singleton *Singleton::GetInstance(const std::string& value) {
-    if(singleton_==nullptr){
-        singleton_ = new Singleton(value);
-    }
-    return singleton_;
+Singleton& Singleton::GetInstance(const std::string& value) {
+    static Singleton onlyInstance(value);
+    return onlyInstance;
 }
 
 void ThreadFoo(){
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    Singleton* singleton = Singleton::GetInstance("FOO");
-    std::cout << singleton->value() << "\n";
+    Singleton& singleton = Singleton::GetInstance("FOO");
+    std::cout << singleton.value() << "\n";
 }
 
 void ThreadBar(){
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    Singleton* singleton = Singleton::GetInstance("BAR");
-    std::cout << singleton->value() << "\n";
+    Singleton& singleton = Singleton::GetInstance("BAR");
+    std::cout << singleton.value() << "\n";
 }
 
 void test01() {
@@ -57,8 +51,8 @@ void test01() {
 }
 
 void Thread_Test(int i) {
-    Singleton* singleton = Singleton::GetInstance(std::to_string(i));
-    std::cout << singleton->value() << "\n";
+    Singleton& singleton = Singleton::GetInstance(std::to_string(i));
+    std::cout << singleton.value() << "\n";
 }
 
 void test02() {
