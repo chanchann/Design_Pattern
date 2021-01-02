@@ -43,27 +43,29 @@ private:
 
 class Director {
 public:
-    // Director(std::unique_ptr<IBuilder> &builder) : m_builder(std::move(builder)) {}
+    // Director(std::unique_ptr<IBuilder> &builder) : m_builder(std::move(builder)) {}  不要写引用
     Director(std::unique_ptr<IBuilder> builder) : m_builder(std::move(builder)) {}
-    void construct() {
+    std::unique_ptr<TextBuilder> construct_text() {
         m_builder->makeTitle("Greeting");
         m_builder->makeString(u8"从早上到下午");
         m_builder->makeItems(std::vector<std::string>{ u8"早上好", u8"下午好" });
         m_builder->makeString(u8"晚上");
         m_builder->makeItems(std::vector<std::string>{ u8"晚上好", u8"晚安", u8"再见" });
         m_builder->close();
+        // Downcast 
+        auto tmp = static_cast<TextBuilder *>(m_builder.release());
+        return std::unique_ptr<TextBuilder>(tmp);;
     }
 
 private:
     std::unique_ptr<IBuilder> m_builder;
 };
-// TODO : https://stackoverflow.com/questions/44462388/return-a-unique-ptr-to-polymorphic-type
+
 int main() {
-    std::unique_ptr<TextBuilder> builder = make_unique<TextBuilder>();
+    std::unique_ptr<IBuilder> builder = make_unique<TextBuilder>();
     Director director(std::move(builder));
-    director.construct();
-    // 如果getResult这种不是继承的，就在外面使用，因为在里面也是基类指针，是无法访问到这个函数的
-    std::string result = builder->getResult();  
+    auto textbuilder = director.construct_text();
+    std::string result = textbuilder->getResult();  
     std::cout << result << std::endl;
 
     return 0;
