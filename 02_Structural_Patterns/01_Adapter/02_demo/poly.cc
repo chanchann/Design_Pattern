@@ -25,19 +25,15 @@ private:
     std::string m_str;
 };
 
-class PainterBanner : public Painter {
+class PainterBanner : public Banner, public Painter {
 public:
-    PainterBanner(const std::string &str) : 
-            m_banner(make_unique<Banner>(str)) 
-        {}
+    PainterBanner(const std::string &str) : Banner(str) {}
     void printStrong() override {
-        m_banner->showWithParen();
+        showWithParen();
     }
     void printWeak() override {
-        m_banner->showWithAster();
+        showWithAster();
     }
-private:
-    std::unique_ptr<Banner> m_banner;
 };
 
 int main(int argc, char **argv) {
