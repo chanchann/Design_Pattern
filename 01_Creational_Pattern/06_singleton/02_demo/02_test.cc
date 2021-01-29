@@ -9,12 +9,11 @@
 class Singleton {
 protected:
     Singleton(const std::string value): value_(value) {}
-    static Singleton* singleton_;
     std::string value_;
 
 public:
-    Singleton(Singleton &other) = delete;
-    void operator=(const Singleton &) = delete;
+    Singleton(const Singleton &other) = delete;
+    const Singleton& operator=(const Singleton &) = delete;
 
     static Singleton& GetInstance(const std::string& value);
 
@@ -66,7 +65,7 @@ void test02() {
 
 int main() {
     test01();
-    // test02();
+    test02();
 
     return 0;
 }
